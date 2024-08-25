@@ -43,13 +43,15 @@ class UserRegisterAPIView(generics.CreateAPIView):
         prof = Profile.objects.get(user=user)
         
         # Set additional profile data
+        phone_number = data.get('phone_number')
+        if phone_number:
+            prof.phone_number = phone_number
+
         profile_picture = data.get('profile_picture')
         if profile_picture:
             prof.profile_picture = profile_picture
 
-        profile_photo = data.get('profile_photo')
-        if profile_photo:
-            prof.profile_photo = profile_photo
+        
 
         display_status = data.get('display_status')
         if display_status:
