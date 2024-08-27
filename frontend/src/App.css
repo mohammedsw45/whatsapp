@@ -1,3 +1,10 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+
 html,
 body,
 div,
@@ -10,7 +17,3 @@ span {
   box-sizing: border-box;
 }
 
-/* body {
-  background-image: url('./images/background.jpg') no-repeat;
-  background-size: cover;
-} */

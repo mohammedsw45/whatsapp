@@ -1,25 +1,130 @@
-import React from 'react';
+// // export default Users;
+// import React, { useState, useEffect } from 'react';
+// import axios from 'axios';
+// import './Users.css';
+// import profile_avatar from "../../images/profile.png";
+// import UserInstance from '../UserInstance/UserInstance';
+
+// function Users() {
+//   const [users, setUsers] = useState([]);
+//   const [error, setError] = useState(null);
+
+//   useEffect(() => {
+//     // Retrieve token from local storage
+//     const token = localStorage.getItem('accessToken');
+
+//     if (!token) {
+//       setError("No access token found. Please log in.");
+//       return;
+//     }
+
+//     // Fetch user data from the API using Axios
+//     axios.get('http://192.168.104.65:8000/account/profiles/', {
+//       headers: {
+//         'Authorization': `Bearer ${token}` // Add Bearer token to headers
+//       }
+//     })
+//     .then(response => {
+//       // Update the state with the profiles from the API response
+//       setUsers(response.data.profiles);
+//     })
+//     .catch(error => {
+//       // Handle error
+//       console.error("Error fetching data:", error);
+//       setError("Failed to fetch user data");
+//     });
+//   }, []); // No dependency on token; it'll be read fresh on each render
+
+//   return (
+//     <div className='users'>
+//       <div className="heading">
+//         <div className="heading-avatar">
+//           <div className="heading-avatar-icon">
+//             <a href="my-profile/profile-page.html"> 
+//               <img src={profile_avatar} alt='profile avatar'/>
+//             </a>
+//           </div>
+//         </div>
+//       </div>
+//       <div className="searchBox">
+//         <div className="searchBox-input">
+//           <input id="searchText" type="text" name="searchText" placeholder="Search"/>
+//         </div>
+//       </div>
+
+//       <div className='user-list'>
+//         {error ? (
+//           <p>{error}</p>
+//         ) : users.length > 0 ? (
+//           users.map(user => (
+//             <UserInstance
+//               key={user.id}
+//               user={{
+//                 id: user.user.id,
+//                 name: `${user.user.first_name} ${user.user.last_name}`.trim() || user.user.username,
+//                 avatar: user.profile_picture || profile_avatar, // Use the profile picture if available, else default avatar
+//                 time: new Date(user.updated_at).toLocaleTimeString(), // Format the updated_at time
+//                 link: 'chats/chat.html'
+//               }}
+//             />
+//           ))
+//         ) : (
+//           <p>No users available</p>
+//         )}
+//       </div>
+//     </div>
+//   );
+// }
+
+// export default Users;
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import './Users.css';
 import profile_avatar from "../../images/profile.png";
-import avatar1 from "../../images/avatar1.png";
-import avatar2 from "../../images/avatar2.png";
-import avatar3 from "../../images/avatar3.png";
-import avatar4 from "../../images/avatar4.png";
-import avatar5 from "../../images/avatar5.png";
-import avatar6 from "../../images/avatar6.png";
 import UserInstance from '../UserInstance/UserInstance';
 
-// Define user data
-const users = [
-  { id: 1, name: 'Mohgammed Hashesho', avatar: avatar1, time: '10:18', link: 'chats/chat.html' },
-  { id: 2, name: 'Yasser Husaan', avatar: avatar2, time: '11:20', link: 'chats/chat.html' },
-  { id: 3, name: 'Ahmmed Baraka', avatar: avatar3, time: '12:15', link: 'chats/chat.html' },
-  { id: 4, name: 'Ali Jasem', avatar: avatar4, time: '13:30', link: 'chats/chat.html' },
-  { id: 5, name: 'Dr Omer', avatar: avatar5, time: '14:45', link: 'chats/chat.html' },
-  { id: 6, name: 'Sadeq', avatar: avatar6, time: '15:00', link: 'chats/chat.html' },
-];
-
 function Users() {
+  const [users, setUsers] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [searchText, setSearchText] = useState('');
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    // Retrieve token from local storage
+    const token = localStorage.getItem('accessToken');
+
+    if (!token) {
+      setError("No access token found. Please log in.");
+      return;
+    }
+
+    // Fetch user data from the API using Axios
+    axios.get('http://192.168.104.65:8000/account/profiles/', {
+      headers: {
+        'Authorization': `Bearer ${token}` // Add Bearer token to headers
+      }
+    })
+    .then(response => {
+      // Update the state with the profiles from the API response
+      setUsers(response.data.profiles);
+      setFilteredUsers(response.data.profiles); // Initialize filtered users
+    })
+    .catch(error => {
+      // Handle error
+      console.error("Error fetching data:", error);
+      setError("Failed to fetch user data");
+    });
+  }, []); // Empty dependency array means this effect runs once on mount
+
+  useEffect(() => {
+    // Filter users based on the search text
+    const filtered = users.filter(user => {
+      const fullName = `${user.user.first_name} ${user.user.last_name}`.trim() || user.user.username;
+      return fullName.toLowerCase().includes(searchText.toLowerCase());
+    });
+    setFilteredUsers(filtered);
+  }, [searchText, users]); // Re-run the effect when searchText or users change
+
   return (
     <div className='users'>
       <div className="heading">
@@ -33,14 +138,36 @@ function Users() {
       </div>
       <div className="searchBox">
         <div className="searchBox-input">
-          <input id="searchText" type="text" name="searchText" placeholder="Search"/>
+          <input
+            id="searchText"
+            type="text"
+            name="searchText"
+            placeholder="Search"
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+          />
         </div>
       </div>
 
       <div className='user-list'>
-        {users.map(user => (
-          <UserInstance key={user.id} user={user} />
-        ))}
+        {error ? (
+          <p>{error}</p>
+        ) : filteredUsers.length > 0 ? (
+          filteredUsers.map(user => (
+            <UserInstance
+              key={user.id}
+              user={{
+                id: user.user.id,
+                name: `${user.user.first_name} ${user.user.last_name}`.trim() || user.user.username,
+                avatar: user.profile_picture || profile_avatar, // Use the profile picture if available, else default avatar
+                time: new Date(user.updated_at).toLocaleTimeString(), // Format the updated_at time
+                link: 'chats/chat.html'
+              }}
+            />
+          ))
+        ) : (
+          <p>No users available</p>
+        )}
       </div>
     </div>
   );

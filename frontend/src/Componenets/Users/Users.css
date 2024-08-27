@@ -30,7 +30,7 @@
     padding: 10px;
   }
   .users .searchBox-input input{
-    height: 55%;
+    height: 100%;
     width: 95%;
     padding: 10px;
     border: none;
@@ -42,4 +42,6 @@
 .user-list{
     padding: 20px;
     color: #000;
+    height: 80%;
+    overflow-y: scroll !important;
 }

@@ -4,8 +4,20 @@ import { FaMicrophone } from "react-icons/fa";
 import { FaRegSmile } from "react-icons/fa";
 import avatar1 from "../../images/avatar1.png";
 import './Chat.css';
+import { useNavigate } from 'react-router-dom';
 
 function Chat() {
+  const navigate = useNavigate(); // Initialize useNavigate
+
+  const handleLogout = () => {
+    // Clear the tokens from localStorage
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+
+    navigate('/login');
+    window.location.reload();
+  };
+
   const textareaRef = useRef(null);
 
   useEffect(() => {
@@ -40,6 +52,9 @@ function Chat() {
             <span>Mohgammed Hashesho</span>
           </div>
         </a>
+        <div className='logout-button'>
+            <button  onClick={handleLogout}>Logout</button>
+          </div>
       </div>
 
       <div className='messages'>
