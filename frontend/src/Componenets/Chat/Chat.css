@@ -1,0 +1,149 @@
+.conversation .heading{
+    padding: 10px 16px 10px 15px;
+    margin: 0;
+    height: 60px;
+    width: 100%;
+    background-color: #eee;
+    border-left: 2px solid rgb(192, 209, 226);
+}
+.conversation .heading .prof-navigate{
+    height: 100%;
+    width: 100%;
+    display: flex;
+    color: #000;
+}
+  
+.conversation .heading .prof-navigate  .heading-avatar {
+    padding: 0;
+  }
+  
+.conversation .heading .prof-navigate .heading-avatar-icon img {
+    border-radius: 50%;
+    cursor: pointer;
+    height: 40px;
+    width: 40px;
+  }
+
+  .conversation .heading .prof-navigate .conversation-name{
+    float: left;
+    font-size: 1.5rem;
+  }
+
+
+  .conversation .messages{
+    padding: 0 !important;
+    margin: 0 !important;
+    background: url("../../images/background.jpg") no-repeat fixed center;
+    background-size: cover;
+    overflow-y: auto;
+    border: 1px solid #f7f7f7;
+    height: calc(100% - 120px);
+  }
+ 
+  
+  .conversation .messages .message-body {
+    margin: 20px;
+    padding: 0 !important;
+    width: auto;
+    height: auto;
+  }
+  
+  .conversation .messages .message-body .message-main-receiver {
+    padding: 10px 20px;
+    max-width: 60%;
+  }
+  
+  .conversation .messages .message-body .message-main-sender {
+    padding: 3px 20px !important;
+    margin-left: 40% !important;
+    max-width: 60%;
+  }
+  
+  .conversation .messages .message-body .message-main-receiver .receiver-message-text {
+    margin: 0 !important;
+    padding: 5px !important;
+    word-wrap:break-word;
+    font-weight: 200;
+    font-size: 14px;
+    padding-bottom: 0 !important;
+  }
+  
+  .conversation .messages .message-body .message-main-sender .sender-message-text {
+    margin: 0 !important;
+    padding: 5px !important;
+    word-wrap:break-word;
+    font-weight: 200;
+    font-size: 14px;
+    padding-bottom: 0 !important;
+    width: auto;
+  }
+  
+  .message-time {
+    margin: 0 !important;
+    margin-left: 50px !important;
+    font-size: 12px;
+    text-align: right;
+    color: #9a9a9a;
+    float: right;
+  
+  }
+  
+  .conversation .messages .message-body .message-main-receiver .receiver {
+    padding: 4px 10px 7px !important;
+    border-radius: 10px 10px 10px 0;
+    background: #ffffff;
+    font-size: 12px;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, .2);
+    word-wrap: break-word;
+  }
+  
+  .conversation .messages .message-body .message-main-sender .sender {
+    float: right;
+    width: auto !important;
+    background: #dcf8c6;
+    border-radius: 10px 10px 0 10px;
+    padding: 4px 10px 7px !important;
+    font-size: 12px;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, .2);
+    word-wrap: break-word;
+  }
+
+
+  .conversation .reply{
+    background-color: #f5f1ee;
+    height: 60px;
+    display: flex;
+  }
+
+  .conversation .reply .reply-emojis{
+    width: 15%;
+  }
+  .conversation .reply .reply-main{
+    width: 80%;
+  }
+.conversation .reply .reply-main .form-control{
+  width: 100%;
+  min-height: 60%;
+  border: none;
+  outline: none;
+  margin-top: 10px;
+  border-radius: 5px;
+  font-size: 1.2rem;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  resize: none;
+}
+  .conversation .reply .reply-recording{
+    width: 15%;
+  }
+
+  .conversation .reply .reply-send{
+    width: 15%;
+  }
+  .conversation .reply svg{
+    height: 60%;
+    width: 50px;
+    color: #746d6d;
+    padding: 12px;
+  }
+  

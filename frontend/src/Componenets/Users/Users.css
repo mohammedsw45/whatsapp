@@ -1,0 +1,45 @@
+.users{
+    background-color: #fff;;
+}
+.users .heading{
+    padding: 10px 16px 10px 15px;
+    margin: 0;
+    height: 60px;
+    width: 100%;
+    background-color: #eee;
+}
+  
+.users .heading-avatar {
+    padding: 0;
+  }
+  
+.users .heading-avatar-icon img {
+    border-radius: 50%;
+    cursor: pointer;
+    height: 40px;
+    width: 40px;
+  }
+  
+.users .searchBox {
+    height: 60px;
+    width: 100%;
+  }
+  .users .searchBox-input{
+    height: 90%;
+    width: 100%;
+    padding: 10px;
+  }
+  .users .searchBox-input input{
+    height: 55%;
+    width: 95%;
+    padding: 10px;
+    border: none;
+    outline: none;
+    border: 1px solid #b8b4b4;
+    border-radius: 5px;
+  }
+
+.user-list{
+    padding: 20px;
+    color: #000;
+}
