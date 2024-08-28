@@ -1,0 +1,51 @@
+.ChatInstance{
+    height: 80px;
+    padding-top: 10px;
+    /* border: 1px solid red; */
+    display: flex;
+    justify-items: center;
+}
+.ChatInstance:hover {
+    background-color: #f2f2f2;
+    border-radius: 5px;
+  }
+
+.ChatInstance .sideBar-avatar{
+    padding: 10px;
+    width: 25%;
+}
+.ChatInstance .sideBar-avatar .avatar-icon img {
+    border-radius: 50%;
+    cursor: pointer;
+    height: 100%;
+    width: 80%;
+    
+  }
+  .ChatInstance .sideBar-main{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    justify-items: center;
+    padding-top: 10px;
+  }
+
+.ChatInstance .sideBar-main .sideBar-name {
+    padding: 10px;
+    width: 35%;
+  }
+  
+.ChatInstance .sideBar-main .sideBar-name .name-meta {
+
+    font-size: 100%;
+    text-align: left;
+    color: #000;
+  }
+
+.ChatInstance .sideBar-main .sideBar-time{
+    padding: 10px;
+    width: 35%;
+    text-align: right;
+}
+  .ChatInstance .sideBar-main .sideBar-time .time-meta{
+    color: #000;
+  }

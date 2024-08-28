@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import './Login.css'; // Assuming the CSS file is named Login.css
-import { useNavigate } from 'react-router-dom'; // Import useNavigate hook
+import { useNavigate, Link } from 'react-router-dom'; // Import useNavigate and Link
+import SERVER_IP from '../../config';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -14,7 +15,7 @@ const Login = () => {
     setError(null); // Reset error state
 
     try {
-      const response = await axios.post('http://192.168.104.65:8000/account/login/', {
+      const response = await axios.post(`${SERVER_IP}/account/login/`, {
         email,
         password,
       });
@@ -36,6 +37,7 @@ const Login = () => {
   return (
     <div className="form-container">
       <div className="form-body">
+        <h1>Login</h1>
         <form onSubmit={handleLogin} className="the-form">
           <label htmlFor="email">Email</label>
           <input
@@ -63,11 +65,10 @@ const Login = () => {
         </form>
 
         {error && <p style={{ color: 'red' }}>{error}</p>}
-      </div>
-
-      <div className="form-footer">
-        <div>
-          <span>Don't have an account?</span> <a href=".">Sign Up</a>
+        <div className="form-footer">
+          <div>
+            <span>Don't have an account?</span> <Link to="/register">Sign Up</Link>
+          </div>
         </div>
       </div>
     </div>

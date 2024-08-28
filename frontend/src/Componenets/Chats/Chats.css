@@ -1,7 +1,12 @@
-.users{
-    background-color: #fff;;
+.chats{
+    display: grid;
+    grid-template-columns: 35%  65%;
 }
-.users .heading{
+
+.chats .users{
+    background-color: #fff;
+}
+.chats .users .heading{
     padding: 10px 16px 10px 15px;
     margin: 0;
     height: 60px;
@@ -11,37 +16,37 @@
     justify-items: center;
 }
   
-.users .heading-avatar {
+.chats .users .heading-avatar {
     padding: 0;
   }
   
-.users .heading-avatar-icon img {
+.chats .users .heading-avatar-icon img {
     border-radius: 50%;
     cursor: pointer;
     height: 40px;
     width: 40px;
   }
  
-.users .heading .user-info h4{
+.chats .users .heading .user-info h4{
   text-align: center;
   margin-top: 10px;
   font-size: 1.4rem;
 }
-.users .heading .add_chat svg{
+.chats .users .heading .add_chat svg{
   height: 100%;
   width: 100%;
   color: rgb(146, 158, 145);
 }
-.users .searchBox {
+.chats .users .searchBox {
     height: 60px;
     width: 100%;
   }
-  .users .searchBox-input{
+  .chats .users .searchBox-input{
     height: 90%;
     width: 100%;
     padding: 10px;
   }
-  .users .searchBox-input input{
+  .chats .users .searchBox-input input{
     height: 100%;
     width: 95%;
     padding: 10px;
@@ -51,9 +56,21 @@
     border-radius: 5px;
   }
 
-.user-list{
+  .chats .user-list {
     padding: 20px;
     color: #000;
     height: 80%;
     overflow-y: scroll !important;
+}
+
+.chats .user-list .call-chat-btn {
+  /* Remove default button styles */
+  all: unset;
+
+  /* Make it still clickable */
+  cursor: pointer;
+
+  /* Optionally, set a display so the button can have a clickable area */
+  display: inline-block;
+  width: 100%;
 }

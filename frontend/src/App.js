@@ -1,7 +1,7 @@
 import './App.css';
 import Home from './Componenets/Home/Home';
 import Login from './Componenets/Login/Login';
-
+import Register from './Componenets/Register/Register'; // Import the Register component
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 
 const isLoggedIn = () => {
@@ -17,6 +17,12 @@ function App() {
           path="/login" 
           element={isLoggedIn() ? <Navigate to="/" /> : <Login />} 
         />
+        {/* Route for registration */}
+        <Route 
+          path="/register" 
+          element={isLoggedIn() ? <Navigate to="/" /> : <Register />} 
+        />
+        {/* Home route */}
         <Route 
           path="/" 
           element={isLoggedIn() ? <Home /> : <Navigate to="/login" />} 

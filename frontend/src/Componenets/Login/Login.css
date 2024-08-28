@@ -27,7 +27,7 @@ a:hover {
  .form-container {
   max-width: 450px;
   margin: 50px auto;
-  max-height: 400px;
+  max-height: 475px;
 }
 
  .form-body {
@@ -40,6 +40,12 @@ a:hover {
     0 10px 10px -5px rgba(0, 0, 0, 0.04);
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
     0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.form-container .form-body h1{
+  text-align: center;
+  margin:  auto 10px;
+  padding-bottom: 30px;
 }
 
 @media only screen and (max-width: 500px) {
@@ -188,6 +194,7 @@ a:hover {
   color: #e6e6e6;
 }
 
-.form-footer div a {
-  color: #695c53;
+.form-footer div a{
+  color: #1a0beb;
+  text-decoration: none;
 }
