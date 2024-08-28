@@ -65,10 +65,15 @@ class ChatListView(generics.ListAPIView):
 class ChatRetrieveAPIView(generics.RetrieveAPIView):
     queryset = Chat.objects.all()
     serializer_class = ChatSerializer
-    permission_classes = [IsAuthenticated, IsAdminUser]
+    permission_classes = [IsAuthenticated]
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
+
+        # Check if the request user is in the list of users for this chat
+        if request.user not in instance.users.all():
+            raise PermissionDenied("You do not have permission to access this chat.")
+
         serializer = self.get_serializer(instance)
         return Response({"chat": serializer.data}, status=status.HTTP_200_OK)
 
