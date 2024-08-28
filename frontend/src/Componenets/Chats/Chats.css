@@ -12,8 +12,8 @@
     height: 60px;
     width: 100%;
     background-color: #eee;
-    display: flex;
-    justify-items: center;
+    display: grid;
+    grid-template-columns: 20%  50% 15% 15%;
 }
   
 .chats .users .heading-avatar {
@@ -26,12 +26,34 @@
     height: 40px;
     width: 40px;
   }
- 
+
+.chats .users .heading .user-info{
+  width: 100%;
+  }
 .chats .users .heading .user-info h4{
   text-align: center;
   margin-top: 10px;
-  font-size: 1.4rem;
+  font-size: 1rem;
 }
+.chats .users .heading .logout .logout-btn {
+  /* Remove default button styles */
+  all: unset;
+
+  /* Make it still clickable */
+  cursor: pointer;
+
+  /* Optionally, set a display so the button can have a clickable area */
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+}
+
+.chats .users .heading .logout .logout-btn svg{
+  width: 100%;
+  height: 100%;
+  color: rgb(146, 158, 145);
+}
+
 .chats .users .heading .add_chat svg{
   height: 100%;
   width: 100%;

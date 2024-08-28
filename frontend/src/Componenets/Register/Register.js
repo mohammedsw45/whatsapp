@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import './Register.css'; // Assuming a separate CSS file for the Register component
 import { useNavigate, Link } from 'react-router-dom';
+import SERVER_IP from '../../config';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -35,7 +36,7 @@ const Register = () => {
     }
 
     try {
-      const response = await axios.post('http://192.168.1.98:8000/account/register/', formDataObj, {
+      const response = await axios.post(`${SERVER_IP}/account/register/`, formDataObj, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
