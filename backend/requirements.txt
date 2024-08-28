@@ -17,8 +17,9 @@ hyperlink==21.0.0
 idna==3.7
 incremental==24.7.2
 msgpack==1.0.8
+pillow==10.4.0
 pyasn1==0.6.0
-pyasn1-modules==0.4.0
+pyasn1_modules==0.4.0
 pycparser==2.22
 PyJWT==2.8.0
 pyOpenSSL==24.2.1
@@ -27,9 +28,9 @@ service-identity==24.1.0
 six==1.16.0
 sqlparse==0.5.0
 tomli==2.0.1
-twisted==24.3.0
+Twisted==24.3.0
 twisted-iocpsupport==1.0.4
 txaio==23.1.1
-typing-extensions==4.12.2
+typing_extensions==4.12.2
 tzdata==2024.1
 zope.interface==7.0.1

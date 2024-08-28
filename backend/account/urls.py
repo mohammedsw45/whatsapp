@@ -1,11 +1,12 @@
 from django.urls import path
 from .views import (
-    MyTokenObtainPairView,UserRegisterAPIView, UpdateProfileView,
+    MyTokenObtainPairView,CurrentProfileView, UserRegisterAPIView, UpdateProfileView,
     ProfileListAPIView, ProfileRetrieveAPIView,DestroyProfileView)
 
 urlpatterns = [
     #User
     path('login/', MyTokenObtainPairView.as_view(), name='login'), ## Login
+    path('me/', CurrentProfileView.as_view(), name='current-user'), ## Current User
     path('register/', UserRegisterAPIView.as_view(), name='register'), ## Register
 
     path('profiles/', ProfileListAPIView.as_view(), name='get_profile_list'), ## Profile list 

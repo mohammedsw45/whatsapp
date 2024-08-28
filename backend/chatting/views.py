@@ -4,7 +4,8 @@ from rest_framework import generics,status,serializers
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from account.permissions import IsAdminUser
-from account.models import User
+from account.models import User,Profile
+from account.serializers import ProfileSerializer
 from .models import Chat, Message
 from .serializers import ChatSerializer, MessageSerializer
 
@@ -25,14 +26,31 @@ class ChatCreateView(generics.CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         request_data = request.data
-        chat = get_chat_by_users(request_data['users'])        
+        
+        # Ensure 'users' key exists and is a list
+        users = request_data.get('users', [])
+        if not isinstance(users, list):
+            return Response({"Error": "Invalid users data format"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Ensure the current user is in the list of users
+        current_user_id = request.user.id
+        if current_user_id not in users:
+            users.append(current_user_id)
+        
+        # Update the request data with the modified users list
+        request_data['users'] = users
+        
+        # Check if a chat with these users already exists
+        chat = get_chat_by_users(users)  # Ensure this function handles a list of user IDs correctly
+        
         if chat:
-            return Response({"Error": "This chat is already exists"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"Error": "This chat already exists"}, status=status.HTTP_400_BAD_REQUEST)
 
+        # Proceed with creating the chat
         serializer = self.get_serializer(data=request_data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
-        return Response({"chat":serializer.data}, status=status.HTTP_201_CREATED)
+        return Response({"chat": serializer.data}, status=status.HTTP_201_CREATED)
 
 class ChatListView(generics.ListAPIView):
     queryset = Chat.objects.all()
@@ -104,6 +122,33 @@ class ChatDeleteView(generics.DestroyAPIView):
             return Response({"Result": "The Chat is deleted successfully"},status=status.HTTP_200_OK)
         else:
             return Response({'Error': 'You are not in this chat'}, status=status.HTTP_403_FORBIDDEN)
+
+
+class UsersWithChatsAPIView(generics.ListAPIView):
+    serializer_class = ProfileSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        # Get all chats that include the authenticated user
+        chats = Chat.objects.filter(users=user)
+        # Get all users from those chats
+        chat_users = User.objects.filter(chats__in=chats).distinct()
+        # Exclude the current user
+        chat_profiles = Profile.objects.filter(user__in=chat_users).exclude(user=user)
+        return chat_profiles
+
+    def get(self, request, *args, **kwargs):
+        try:
+            serializer = self.get_serializer(self.get_queryset(), many=True)
+            return Response({"profiles": serializer.data}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(
+                {"message": f"An error occurred: {str(e)}"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+
 
 
 # Message

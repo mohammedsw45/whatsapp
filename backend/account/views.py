@@ -1,4 +1,4 @@
-from .serializers import MyTokenObtainPairSerializer,SingUpSerializer,EditUserSerializer, ProfileSerializer,EditProfileSerializer
+from .serializers import MyTokenObtainPairSerializer,UserSerializer,SingUpSerializer,EditUserSerializer, ProfileSerializer,EditProfileSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics,status,serializers
 from django.contrib.auth.hashers import make_password
@@ -15,6 +15,14 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 class MyTokenObtainPairView(TokenObtainPairView):
     
     serializer_class = MyTokenObtainPairSerializer
+
+class CurrentProfileView(generics.RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ProfileSerializer
+
+    def get_object(self):
+        # Retrieve the profile of the currently authenticated user
+        return Profile.objects.get(user=self.request.user)
 
 # Register User - (Profile built in)
 class UserRegisterAPIView(generics.CreateAPIView):
@@ -94,32 +102,34 @@ class ProfileRetrieveAPIView(generics.RetrieveAPIView):
                 status=status.HTTP_400_BAD_REQUEST
             )       
 # Get List Profiles
-class ProfileListAPIView(generics.ListAPIView): 
+class ProfileListAPIView(generics.ListAPIView):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]  # Allow any user to access this view
 
     def get(self, request, *args, **kwargs):
         try:
-            user = self.request.user
-            if user.is_superuser:
-                serializer = self.list(request, *args, **kwargs)
-                if serializer.data:
-                    return Response(
-                        {"profiles": serializer.data},
-                        status=status.HTTP_200_OK
-                    )
+            serializer = self.list(request, *args, **kwargs)
+            if serializer.data:
+                return Response(
+                    {"profiles": serializer.data},
+                    status=status.HTTP_200_OK
+                )
             else:
                 return Response(
-                    {"message": "You do not have permission to view profiles."},
-                    status=status.HTTP_403_FORBIDDEN
+                    {"message": "No profiles found."},
+                    status=status.HTTP_404_NOT_FOUND
                 )
         except Exception as e:
             return Response(
                 {"message": f"An error occurred: {str(e)}"},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
+
+
+
+
+
 # Update Profile  
 class UpdateProfileView(generics.UpdateAPIView):
     queryset = User.objects.all()
