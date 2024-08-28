@@ -29,7 +29,7 @@ class ChatCreateView(generics.CreateAPIView):
         
         # Ensure 'users' key exists and is a list
         users = request_data.get('users', [])
-        if not isinstance(users, list):
+        if not isinstance(users, list) or len(users)<=0:
             return Response({"Error": "Invalid users data format"}, status=status.HTTP_400_BAD_REQUEST)
         
         # Ensure the current user is in the list of users
@@ -124,6 +124,7 @@ class ChatDeleteView(generics.DestroyAPIView):
             return Response({'Error': 'You are not in this chat'}, status=status.HTTP_403_FORBIDDEN)
 
 
+
 class UsersWithChatsAPIView(generics.ListAPIView):
     serializer_class = ProfileSerializer
     permission_classes = [IsAuthenticated]
@@ -140,14 +141,36 @@ class UsersWithChatsAPIView(generics.ListAPIView):
 
     def get(self, request, *args, **kwargs):
         try:
-            serializer = self.get_serializer(self.get_queryset(), many=True)
-            return Response({"profiles": serializer.data}, status=status.HTTP_200_OK)
+            queryset = self.get_queryset()
+            profiles = list(queryset)  # Convert QuerySet to a list for easier manipulation
+            serializer = self.get_serializer(profiles, many=True)
+            
+            # Prepare a map of profile IDs to their serialized data
+            profile_data_map = {profile.id: data for profile, data in zip(profiles, serializer.data)}
+            response_data = []
+
+            user = self.request.user
+            
+            for profile in profiles:
+                # Retrieve the serialized data for the current profile
+                profile_data = profile_data_map[profile.id]
+                
+                # Find chats for the current profile's user
+                user_chats = Chat.objects.filter(users=profile.user)
+                
+                # Find common chats between the authenticated user and the profile's user
+                common_chat_ids = [chat.id for chat in user_chats if chat in Chat.objects.filter(users=user)]
+                
+                # Add the chat IDs to the profile data
+                profile_data['chat_ids'] = common_chat_ids
+                response_data.append(profile_data)
+
+            return Response({"profiles": response_data}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response(
                 {"message": f"An error occurred: {str(e)}"},
                 status=status.HTTP_400_BAD_REQUEST
             )
-
 
 
 
