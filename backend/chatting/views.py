@@ -53,9 +53,12 @@ class ChatCreateView(generics.CreateAPIView):
         return Response({"chat": serializer.data}, status=status.HTTP_201_CREATED)
 
 class ChatListView(generics.ListAPIView):
-    queryset = Chat.objects.all()
     serializer_class = ChatSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        # Get only the chats where the request user is a participant
+        return Chat.objects.filter(users=self.request.user)
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
