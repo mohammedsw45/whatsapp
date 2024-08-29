@@ -82,8 +82,8 @@ function Chats() {
     setFilteredChats(filtered);
   }, [searchText, chats]);
 
-  const handleChatClick = (chatId) => {
-    setSelectedChatId(chatId); // Set the selected chat ID
+  const handleChatClick = (chatIdd) => {
+    setSelectedChatId(chatIdd); // Set the selected chat ID
   };
 
   return (
