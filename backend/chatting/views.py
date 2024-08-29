@@ -8,6 +8,7 @@ from account.models import User,Profile
 from account.serializers import ProfileSerializer
 from .models import Chat, Message
 from .serializers import ChatSerializer, MessageSerializer
+from django.db.models import OuterRef, Subquery
 
 #Chat
 def get_chat_by_users(user_ids):
@@ -57,8 +58,17 @@ class ChatListView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        # Get only the chats where the request user is a participant
-        return Chat.objects.filter(users=self.request.user)
+        user = self.request.user
+        
+        # Get the latest message timestamp for each chat
+        latest_message_subquery = Message.objects.filter(chat=OuterRef('pk')).order_by('-timestamp').values('timestamp')[:1]
+
+        # Annotate the queryset with the latest message timestamp
+        queryset = Chat.objects.filter(users=user).annotate(
+            last_message_timestamp=Subquery(latest_message_subquery)
+        ).order_by('-last_message_timestamp')
+
+        return queryset
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
