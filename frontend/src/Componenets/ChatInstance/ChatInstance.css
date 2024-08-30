@@ -31,7 +31,7 @@
 
 .ChatInstance .sideBar-main .sideBar-name {
     padding: 10px;
-    width: 35%;
+    width: 40%;
   }
   
 .ChatInstance .sideBar-main .sideBar-name .name-meta {
@@ -43,9 +43,24 @@
 
 .ChatInstance .sideBar-main .sideBar-time{
     padding: 10px;
-    width: 35%;
+    width: 30%;
     text-align: right;
 }
   .ChatInstance .sideBar-main .sideBar-time .time-meta{
     color: #000;
+  }
+
+.ChatInstance .sideBar-main .sideBar-num-notifications{
+    padding: 10px;
+    width: 25%;
+    text-align: right;
+}
+
+  .ChatInstance .sideBar-main .sideBar-num-notifications .num-notifications{
+    padding: 10%;
+    border: 1px solid green;
+    border-radius: 50%;
+    height: 100%;
+    width: 100%;
+    
   }
