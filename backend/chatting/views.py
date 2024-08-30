@@ -9,6 +9,9 @@ from account.serializers import ProfileSerializer
 from .models import Chat, Message
 from .serializers import ChatSerializer, MessageSerializer
 from django.db.models import OuterRef, Subquery
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+
 
 #Chat
 def get_chat_by_users(user_ids):
@@ -192,6 +195,25 @@ class UsersWithChatsAPIView(generics.ListAPIView):
 
 
 
+# # Message
+# class MessageCreateView(generics.CreateAPIView):
+#     serializer_class = MessageSerializer
+#     permission_classes = [IsAuthenticated]
+    
+#     def create(self, request, *args, **kwargs):
+#         request_data = request.data
+#         sender = self.request.user
+#         chat = get_object_or_404(Chat, id=self.kwargs['chat_id'])      
+#         if sender not in chat.users.all():
+#             return Response({"Error": "Sender must be a participant in the chat."}, status=status.HTTP_400_BAD_REQUEST)
+        
+#         message = Message.objects.create(chat=chat, sender=sender, text = request_data['text'])
+        
+#         serializer = MessageSerializer(message, many=False)
+
+
+#         return Response({"message": serializer.data}, status=status.HTTP_201_CREATED)
+
 # Message
 class MessageCreateView(generics.CreateAPIView):
     serializer_class = MessageSerializer
@@ -201,17 +223,32 @@ class MessageCreateView(generics.CreateAPIView):
         request_data = request.data
         sender = self.request.user
         chat = get_object_or_404(Chat, id=self.kwargs['chat_id'])      
+
+        # Ensure the sender is a participant in the chat
         if sender not in chat.users.all():
             return Response({"Error": "Sender must be a participant in the chat."}, status=status.HTTP_400_BAD_REQUEST)
         
-        message = Message.objects.create(chat=chat, sender=sender, text = request_data['text'])
+        # Create the message
+        message = Message.objects.create(chat=chat, sender=sender, text=request_data['text'])
         
+        # Serialize the message data
         serializer = MessageSerializer(message, many=False)
-
+        
+        # Send message to WebSocket group
+        channel_layer = get_channel_layer()
+        group_name = f'chat_{chat.id}'#_{sender.profile_user.id}'
+        async_to_sync(channel_layer.group_send)(
+            group_name,  # Room group name
+            {
+                'type': 'chat_message',
+                'message': message.text,
+                'sender_id': sender.id,  # Ensure sender's profile ID is used
+                'timestamp': message.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
+            }
+        )
 
         return Response({"message": serializer.data}, status=status.HTTP_201_CREATED)
-
-
+    
 class MessageListView(generics.ListAPIView):
     serializer_class = MessageSerializer
     permission_classes = [IsAuthenticated]
@@ -274,3 +311,35 @@ class MessageDeleteView(generics.DestroyAPIView):
             return Response({"Result": "Message deleted successfully"}, status=status.HTTP_200_OK)
         else:
             return Response({'Error': 'You are not in this chat'}, status=status.HTTP_403_FORBIDDEN)
+
+
+'''
+
+
+from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
+from .models import Post
+from .serializers import PostSerializer
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+
+class PostViewSet(viewsets.ModelViewSet):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        post = serializer.save(user=self.request.user)
+        # Notify users in the specific group for this user
+        channel_layer = get_channel_layer()
+        group_name = f'chat_{self.request.user.id}'  # Ensure the group name matches
+
+        async_to_sync(channel_layer.group_send)(
+            group_name,
+            {
+                'type': 'new_post',
+                'message': f'New post created: {post.title}'
+            }
+        )
+
+'''
