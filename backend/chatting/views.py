@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404
-from django.db.models import Count
+from django.db.models import Count, Q, OuterRef, Subquery, IntegerField
 from rest_framework import generics,status,serializers
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -56,19 +56,50 @@ class ChatCreateView(generics.CreateAPIView):
         self.perform_create(serializer)
         return Response({"chat": serializer.data}, status=status.HTTP_201_CREATED)
 
+# class ChatListView(generics.ListAPIView):
+#     serializer_class = ChatSerializer
+#     permission_classes = [IsAuthenticated]
+
+#     def get_queryset(self):
+#         user = self.request.user
+        
+#         # Get the latest message timestamp for each chat
+#         latest_message_subquery = Message.objects.filter(chat=OuterRef('pk')).order_by('-timestamp').values('timestamp')[:1]
+
+#         # Annotate the queryset with the latest message timestamp
+#         queryset = Chat.objects.filter(users=user).annotate(
+#             last_message_timestamp=Subquery(latest_message_subquery)
+#         ).order_by('-last_message_timestamp')
+
+#         return queryset
+
+#     def list(self, request, *args, **kwargs):
+#         queryset = self.get_queryset()
+#         serializer = self.get_serializer(queryset, many=True)
+#         return Response({"chats": serializer.data}, status=status.HTTP_200_OK)
+
 class ChatListView(generics.ListAPIView):
     serializer_class = ChatSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user
-        
-        # Get the latest message timestamp for each chat
-        latest_message_subquery = Message.objects.filter(chat=OuterRef('pk')).order_by('-timestamp').values('timestamp')[:1]
 
-        # Annotate the queryset with the latest message timestamp
+        # Subquery to get the latest message timestamp for each chat
+        latest_message_subquery = Message.objects.filter(
+            chat=OuterRef('pk')
+        ).order_by('-timestamp').values('timestamp')[:1]
+
+        # Subquery to count unread messages in the chat, excluding those sent by the current user
+        unread_messages_subquery = Message.objects.filter(
+            chat=OuterRef('pk'),
+            is_read=False
+        ).exclude(sender=user).values('chat').annotate(unread_count=Count('id')).values('unread_count')
+
+        # Annotate the queryset with the latest message timestamp and unread messages count
         queryset = Chat.objects.filter(users=user).annotate(
-            last_message_timestamp=Subquery(latest_message_subquery)
+            last_message_timestamp=Subquery(latest_message_subquery),
+            unread_messages_count=Subquery(unread_messages_subquery, output_field=IntegerField())
         ).order_by('-last_message_timestamp')
 
         return queryset
@@ -131,6 +162,28 @@ class ChatUpdateView(generics.UpdateAPIView):
         else:
             return Response({'Error': 'You are not in this chat'}, status=status.HTTP_403_FORBIDDEN)
 
+class ChangeChatUpdateView(generics.UpdateAPIView):
+    queryset = Chat.objects.all()
+    serializer_class = ChatSerializer
+    permission_classes = [IsAuthenticated]
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+
+        # Ensure the user is part of the chat
+        if request.user in instance.users.all():
+            # Update the Chat instance
+            serializer = self.get_serializer(instance, data=request.data, partial=True)
+            serializer.is_valid(raise_exception=True)
+            self.perform_update(serializer)
+
+            # Update all messages where the sender is NOT the requested user
+            instance.messages.exclude(sender=request.user).update(is_read=True)
+
+            return Response({"chat": serializer.data}, status=status.HTTP_202_ACCEPTED)
+        else:
+            return Response({'Error': 'You are not in this chat'}, status=status.HTTP_403_FORBIDDEN)
+        
 class ChatDeleteView(generics.DestroyAPIView):
     queryset = Chat.objects.all()
     serializer_class = ChatSerializer
