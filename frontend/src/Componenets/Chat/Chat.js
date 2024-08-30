@@ -174,7 +174,7 @@ function Chat({ chatId }) {
             </div>
           </div>
           <div className='conversation-name'>
-            <span>{chatData ? chatData.title : "Loading..."}</span>
+            <span>{receiverProfile ? `${receiverProfile.user.first_name} ${receiverProfile.user.last_name}`  : "Loading..."}</span>
           </div>
         </a>
       </div>
