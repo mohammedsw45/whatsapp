@@ -1,20 +1,46 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import axios from 'axios';
 import { IoMdSend } from "react-icons/io";
 import { FaMicrophone, FaRegSmile } from "react-icons/fa";
 import './Chat.css';
 import SERVER_IP from '../../config'; // Ensure this imports the correct server IP
+import profile_avatar from "../../images/profile.png";
 
-function Chat({ chatId, currentProfileId }) {
+
+function Chat({ chatId }) {
   const [chatData, setChatData] = useState(null);
   const [currentProfile, setCurrentProfile] = useState(null); // State for the current profile
+  const [receiverProfile, setReceiverProfile] = useState(null); // State for the receiver profile
   const [error, setError] = useState(null);
   const [messageText, setMessageText] = useState(''); // State for message text
+  const [currentProfileId, setCurrentProfileId] = useState(null); // State for the current profile ID
   const textareaRef = useRef(null);
+  const lastMessageRef = useRef(null); // Ref to focus on the last message
+
+  // Fetch the current user's profile data on component mount
+  useEffect(() => {
+    const fetchCurrentProfile = async () => {
+      try {
+        const token = localStorage.getItem('accessToken');
+        const response = await axios.get(`${SERVER_IP}/account/me/`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        setCurrentProfile(response.data);
+        setCurrentProfileId(response.data.id);
+      } catch (error) {
+        console.error("Error fetching current user data:", error);
+        setError("Failed to fetch current user data");
+      }
+    };
+
+    fetchCurrentProfile();
+  }, []); // Empty dependency array means this effect runs once on mount
 
   // Function to fetch chat data
-  const fetchChatData = async () => {
-    if (!chatId) return; // Return if no chatId is provided
+  const fetchChatData = useCallback(async () => {
+    if (!chatId || !currentProfileId) return; // Return if no chatId or currentProfileId is provided
 
     try {
       const token = localStorage.getItem('accessToken');
@@ -24,23 +50,61 @@ function Chat({ chatId, currentProfileId }) {
         }
       });
 
-      // Set chat data
+      // Set chat data and extract the current profile
       setChatData(response.data.chat);
 
-      // Extract and set the current profile
-      const profile = response.data.chat.profiles.find(profile => profile.id === currentProfileId);
-      setCurrentProfile(profile);
+      // Set the receiver profile
+      const receiver = response.data.chat.profiles.find(profile => profile.id !== currentProfileId);
+      setReceiverProfile(receiver);
 
     } catch (error) {
       console.error("Error fetching chat data:", error);
       setError("Failed to fetch chat data");
     }
-  };
+  }, [chatId, currentProfileId]);
+
+  // Memoized function for handling WebSocket messages
+  const handleWebSocketMessage = useCallback((event) => {
+    console.log('WebSocket message received:', event.data);
+    fetchChatData();
+  }, [fetchChatData]);
+
+  // WebSocket setup
+  useEffect(() => {
+    if (!chatId || !currentProfileId) return;
+
+    // const socketInstance = new WebSocket(`ws://127.0.0.1:8000/ws/chat/${chatId}/${currentProfileId}/`);
+    const socketInstance = new WebSocket(`ws://127.0.0.1:8000/ws/chat/${chatId}/`);
+    console.log("****************************************");
+    console.log(socketInstance);
+    console.log("****************************************");
+
+    socketInstance.onopen = () => {
+      console.log("WebSocket connection opened");
+    };
+
+    socketInstance.onmessage = (event) => {
+      handleWebSocketMessage(event);
+    };
+
+    socketInstance.onclose = () => {
+      console.log("WebSocket connection closed");
+    };
+
+    socketInstance.onerror = (error) => {
+      console.error("WebSocket error:", error);
+    };
+
+    // Cleanup WebSocket connection on component unmount
+    return () => {
+      socketInstance.close();
+    };
+  }, [chatId, currentProfileId, handleWebSocketMessage]);
 
   // Fetch chat data when chatId or currentProfileId changes
   useEffect(() => {
     fetchChatData();
-  }, [chatId, currentProfileId]);
+  }, [chatId, currentProfileId, fetchChatData]);
 
   // Adjust textarea height on input
   useEffect(() => {
@@ -53,7 +117,6 @@ function Chat({ chatId, currentProfileId }) {
 
     adjustHeight(); // Adjust height on initial render
 
-    // Adjust height on input change
     const textarea = textareaRef.current;
     textarea.addEventListener('input', adjustHeight);
 
@@ -61,6 +124,13 @@ function Chat({ chatId, currentProfileId }) {
       textarea.removeEventListener('input', adjustHeight);
     };
   }, []);
+
+  // Scroll to the last message whenever chat data changes
+  useEffect(() => {
+    if (lastMessageRef.current) {
+      lastMessageRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [chatData]);
 
   // Function to handle message send
   const handleSendMessage = async (event) => {
@@ -90,17 +160,18 @@ function Chat({ chatId, currentProfileId }) {
   return (
     <div className='conversation'>
       <div className="heading">
-        <a className='prof-navigate' href="my-profile/profile-page.html"> 
+        <a className='prof-navigate' href="my-profile/profile-page.html">
           <div className="heading-avatar">
-             <div className="heading-avatar-icon">
-                {chatData && chatData.profiles && chatData.profiles.length > 1 && (
-                  chatData.profiles[0].id === currentProfileId ? (
-                    <img src={`${SERVER_IP}${chatData.profiles[1].profile_picture}`} alt="avatar1" />
-                  ) : (
-                    <img src={`${SERVER_IP}${chatData.profiles[0].profile_picture}`} alt="avatar2" />
-                  )
-                )}
-             </div>
+            <div className="heading-avatar-icon">
+              {chatData && receiverProfile && (
+                <img 
+                    src={receiverProfile.profile_picture ?`${SERVER_IP}${receiverProfile.profile_picture}` : profile_avatar} 
+                    alt="profile avatar" 
+                  />
+              )}
+                  
+              
+            </div>
           </div>
           <div className='conversation-name'>
             <span>{chatData ? chatData.title : "Loading..."}</span>
@@ -112,8 +183,12 @@ function Chat({ chatId, currentProfileId }) {
         {error ? (
           <p>{error}</p>
         ) : chatData ? (
-          chatData.messages.map(message => (
-            <div className="message-body" key={message.id}>
+          chatData.messages.map((message, index) => (
+            <div 
+              className="message-body" 
+              key={message.id} // Ensure each message has a unique key
+              ref={index === chatData.messages.length - 1 ? lastMessageRef : null} // Attach ref to last message
+            >
               <div className={`${message.sender === currentProfileId ? 'message-main-sender' : 'message-main-receiver'}`}>
                 <div className={message.sender === currentProfileId ? 'sender' : 'receiver'}>
                   <div className={message.sender === currentProfileId ? 'sender-message-text' : 'receiver-message-text'}>
@@ -139,8 +214,8 @@ function Chat({ chatId, currentProfileId }) {
           <textarea
             className="form-control"
             rows="1"
-            id="message-textarea" // Unique ID for textarea
-            name="message" // Name attribute for textarea
+            id="message-textarea"
+            name="message"
             ref={textareaRef}
             value={messageText}
             onChange={(e) => setMessageText(e.target.value)}
@@ -158,3 +233,4 @@ function Chat({ chatId, currentProfileId }) {
 }
 
 export default Chat;
+

@@ -5,8 +5,7 @@ import profile_avatar from "../../images/profile.png";
 import SERVER_IP from '../../config';
 import { ImUserPlus } from "react-icons/im";
 import { IoLogOutOutline } from "react-icons/io5";
-
-import { Link, useNavigate} from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import ChatInstance from '../ChatInstance/ChatInstance';
 import Chat from '../Chat/Chat';
 
@@ -19,6 +18,7 @@ function Chats() {
   const [selectedChatId, setSelectedChatId] = useState(null); // State for selected chat ID
   const [currentProfileId, setCurrentProfileId] = useState(null); // State for selected chat ID
   const navigate = useNavigate();
+
   const handleLogout = () => {
     // Clear the tokens from localStorage
     localStorage.removeItem('accessToken');
@@ -29,10 +29,6 @@ function Chats() {
   };
 
   useEffect(() => {
-
-    
-
-
     const token = localStorage.getItem('accessToken');
 
     if (!token) {
@@ -49,13 +45,15 @@ function Chats() {
     .then(response => {
       setChats(response.data.chats);
       setFilteredChats(response.data.chats); // Initialize filtered chats
-      setSelectedChatId(response.data.chats[0].id)
-      
+      if (response.data.chats.length > 0) {
+        setSelectedChatId(response.data.chats[0].id);
+      }
     })
     .catch(error => {
       console.error("Error fetching data:", error);
       setError("Failed to fetch chats data");
     });
+
     // Fetch data for the authenticated user
     axios.get(`${SERVER_IP}/account/me/`, {
       headers: {
@@ -64,7 +62,7 @@ function Chats() {
     })
     .then(response => {
       setCurrentProfile(response.data); // Store the authenticated user data
-      setCurrentProfileId(response.data.id)
+      setCurrentProfileId(response.data.id);
     })
     .catch(error => {
       console.error("Error fetching current user data:", error);
@@ -74,7 +72,7 @@ function Chats() {
 
   useEffect(() => {
     const filtered = chats.filter(chat => {
-      return chat.profiles.some(profile => {
+      return chat.profiles && chat.profiles.some(profile => {
         const fullName = `${profile.user.first_name} ${profile.user.last_name}`.trim() || profile.user.username;
         return fullName.toLowerCase().includes(searchText.toLowerCase());
       });
@@ -82,8 +80,8 @@ function Chats() {
     setFilteredChats(filtered);
   }, [searchText, chats]);
 
-  const handleChatClick = (chatIdd) => {
-    setSelectedChatId(chatIdd); // Set the selected chat ID
+  const handleChatClick = (chatId) => {
+    setSelectedChatId(chatId); // Set the selected chat ID
   };
 
   return (
@@ -134,13 +132,12 @@ function Chats() {
           {error ? (
             <p>{error}</p>
           ) : filteredChats.length > 0 ? (
-            
             filteredChats.map(chat => {
               // Check if profiles exist and are not empty
               if (!chat.profiles || chat.profiles.length === 0) return null;
               
               let profile = chat.profiles[0];
-              if (chat.profiles.length > 1 && chat.profiles[0].id.toString() === currentProfile.id.toString()) {
+              if (chat.profiles.length > 1 && chat.profiles[0].id.toString() === currentProfileId?.toString()) {
                 profile = chat.profiles[1];
               }
             
@@ -167,11 +164,10 @@ function Chats() {
             <p>No chats available</p>
           )}
         </div>
-
       </div>
 
       <div>
-      <Chat chatId={selectedChatId} currentProfileId={currentProfileId} />
+        {selectedChatId && <Chat chatId={selectedChatId} currentProfileId={currentProfileId} />}
       </div>
     </div>
   );
