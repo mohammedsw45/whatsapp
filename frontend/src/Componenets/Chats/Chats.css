@@ -1,12 +1,12 @@
-.chats{
+.chats  .chat-view{
     display: grid;
     grid-template-columns: 35%  65%;
 }
 
-.chats .users{
+.chats .chat-view .users{
     background-color: #fff;
 }
-.chats .users .heading{
+.chats .chat-view .users .heading{
     padding: 10px 16px 10px 15px;
     margin: 0;
     height: 60px;
@@ -16,26 +16,26 @@
     grid-template-columns: 20%  50% 15% 15%;
 }
   
-.chats .users .heading-avatar {
+.chats .chat-view .users .heading-avatar {
     padding: 0;
   }
   
-.chats .users .heading-avatar-icon img {
+.chats .chat-view .users .heading-avatar-icon img {
     border-radius: 50%;
     cursor: pointer;
     height: 40px;
     width: 40px;
   }
 
-.chats .users .heading .user-info{
+.chats .chat-view .users .heading .user-info{
   width: 100%;
   }
-.chats .users .heading .user-info h4{
+.chats .chat-view .users .heading .user-info h4{
   text-align: center;
   margin-top: 10px;
   font-size: 1rem;
 }
-.chats .users .heading .logout .logout-btn {
+.chats .chat-view .users .heading .logout .logout-btn {
   /* Remove default button styles */
   all: unset;
 
@@ -48,27 +48,32 @@
   height: 100%;
 }
 
-.chats .users .heading .logout .logout-btn svg{
+.chats .chat-view .users .heading .logout .logout-btn svg{
   width: 100%;
   height: 100%;
   color: rgb(146, 158, 145);
 }
 
-.chats .users .heading .add_chat svg{
+.chats .chat-view .users .heading .add_chat button{
+  height: 100%;
+  width: 100%;
+  border: none;
+}
+.chats .chat-view .users .heading .add_chat svg{
   height: 100%;
   width: 100%;
   color: rgb(146, 158, 145);
 }
-.chats .users .searchBox {
+.chats .chat-view .users .searchBox {
     height: 60px;
     width: 100%;
   }
-  .chats .users .searchBox-input{
+  .chats .chat-view .users .searchBox-input{
     height: 90%;
     width: 100%;
     padding: 10px;
   }
-  .chats .users .searchBox-input input{
+  .chats .chat-view .users .searchBox-input input{
     height: 100%;
     width: 95%;
     padding: 10px;
@@ -78,14 +83,14 @@
     border-radius: 5px;
   }
 
-  .chats .user-list {
+  .chats .chat-view .user-list {
     padding: 20px;
     color: #000;
     height: 80%;
     overflow-y: scroll !important;
 }
 
-.chats .user-list .call-chat-btn {
+.chats .chat-view .user-list .call-chat-btn {
   /* Remove default button styles */
   all: unset;
 

@@ -249,6 +249,7 @@ function Chat({ chatId }) {
   const [receiverProfile, setReceiverProfile] = useState(null);
   const [error, setError] = useState(null);
   const [messageText, setMessageText] = useState('');
+  const [CreatedMessage, setCreatedMessage] = useState(false);
   const [currentProfileId, setCurrentProfileId] = useState(null);
   const textareaRef = useRef(null);
   const lastMessageRef = useRef(null);
@@ -328,13 +329,14 @@ function Chat({ chatId }) {
         });
 
         console.log('Messages marked as read:', response.data);
+        setCreatedMessage(false);
       } catch (error) {
         console.error("Error marking messages as read:", error);
       }
     };
 
     markMessagesAsRead();
-  }, [chatId, currentProfileId]);
+  }, [chatId, currentProfileId, CreatedMessage]);
 
   // Adjust textarea height on input
   useEffect(() => {
@@ -377,6 +379,7 @@ function Chat({ chatId }) {
       });
 
       setMessageText('');
+      setCreatedMessage(true);
       fetchChatData();
     } catch (error) {
       console.error("Error sending message:", error);
@@ -423,7 +426,6 @@ function Chat({ chatId }) {
           <>
             {readMessages.length > 0 && (
               <>
-                <h3>Read Messages</h3>
                 {readMessages.map((message, index) => (
                   <div 
                     className="message-body" 

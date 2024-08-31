@@ -1,6 +1,8 @@
 import './App.css';
 import Home from './Componenets/Home/Home';
 import Login from './Componenets/Login/Login';
+import Users from './Componenets/Users/Users';
+
 import Register from './Componenets/Register/Register'; // Import the Register component
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 
@@ -26,6 +28,11 @@ function App() {
         <Route 
           path="/" 
           element={isLoggedIn() ? <Home /> : <Navigate to="/login" />} 
+        />
+        {/* User page route */}
+        <Route 
+          path="/users" 
+          element={isLoggedIn() ? <Users /> : <Navigate to="/login" />} 
         />
       </Routes>
     </Router>

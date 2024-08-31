@@ -1,47 +1,53 @@
-.users{
-    background-color: #fff;;
+.users-page{
+    background-color: #fff;
+    width: 35%;
 }
-.users .heading{
+.users-page .heading{
     padding: 10px 16px 10px 15px;
     margin: 0;
     height: 60px;
     width: 100%;
     background-color: #eee;
-    display: flex;
-    justify-items: center;
+    display: grid;
+    grid-template-columns: 30%  50% 20%;
 }
   
-.users .heading-avatar {
+.users-page .heading .heading-avatar {
     padding: 0;
   }
   
-.users .heading-avatar-icon img {
+.users-page .heading .heading-avatar .heading-avatar-icon img {
     border-radius: 50%;
     cursor: pointer;
     height: 40px;
     width: 40px;
   }
- 
-.users .heading .user-info h4{
-  text-align: center;
+
+.users-page .heading .user-info h4{
+  text-align: left;
   margin-top: 10px;
-  font-size: 1.4rem;
+  font-size: 1rem;
 }
-.users .heading .add_chat svg{
+
+.users-page .heading .back-button button{
+    width: 100%;
+    height: 100%;
+}
+.users-page .heading .back-button svg{
   height: 100%;
   width: 100%;
   color: rgb(146, 158, 145);
 }
-.users .searchBox {
+.users-page .searchBox {
     height: 60px;
     width: 100%;
   }
-  .users .searchBox-input{
+  .users-page .searchBox-input{
     height: 90%;
     width: 100%;
     padding: 10px;
   }
-  .users .searchBox-input input{
+  .users-page .searchBox-input input{
     height: 100%;
     width: 95%;
     padding: 10px;

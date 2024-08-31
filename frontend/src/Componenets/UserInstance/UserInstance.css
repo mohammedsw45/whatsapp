@@ -2,8 +2,8 @@
     height: 80px;
     padding-top: 10px;
     /* border: 1px solid red; */
-    display: flex;
-    justify-items: center;
+    display: grid;
+    grid-template-columns: 20% 80%;
 }
 .userInstance:hover {
     background-color: #f2f2f2;
@@ -12,7 +12,6 @@
 
 .userInstance .sideBar-avatar{
     padding: 10px;
-    width: 25%;
 }
 .userInstance .sideBar-avatar .avatar-icon img {
     border-radius: 50%;
@@ -23,15 +22,13 @@
   }
   .userInstance .sideBar-main{
     width: 100%;
-    display: flex;
-    justify-content: space-between;
-    justify-items: center;
     padding-top: 10px;
+    display: grid;
+    grid-template-columns: 35% 35% 30%;
   }
 
 .userInstance .sideBar-main .sideBar-name {
     padding: 10px;
-    width: 35%;
   }
   
 .userInstance .sideBar-main .sideBar-name .name-meta {
@@ -43,9 +40,28 @@
 
 .userInstance .sideBar-main .sideBar-time{
     padding: 10px;
-    width: 35%;
     text-align: right;
 }
   .userInstance .sideBar-main .sideBar-time .time-meta{
     color: #000;
   }
+
+
+
+
+.userInstance .sideBar-main .sideBar-chat{
+    padding: 10px;
+    text-align: right;
+}
+
+.userInstance .sideBar-main .sideBar-chat button{
+    all: unset;
+    width: 100%;
+    height: 100%;
+}
+
+.userInstance .sideBar-main .sideBar-chat button svg{
+    width: 80%;
+    height: 80%;
+    color: green;
+}
